@@ -1,0 +1,19 @@
+import ECommerce from "@/components/Dashboard/E-commerce";
+import { Metadata } from "next";
+import SignUp from "./auth/signup/page";
+import SignIn from "./auth/signin/page";
+import DefaultLayout from "@/components/Layouts/DefaultLayout";
+
+export const metadata: Metadata = {
+  title:
+    "AI-CALLER",
+  description: "AI-CALLER",
+};
+
+export default function Home() {
+  return (
+    <>
+      <SignUp/>
+    </>
+  );
+}
