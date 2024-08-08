@@ -11,25 +11,29 @@ const DropdownUser = () => {
   useEffect(() => {
     // Fetch the user's email from the API
     const fetchUserEmail = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+    
       try {
-        const response = await fetch('https://ai-call-assistant.fly.dev/api/me', {
-          method: 'GET',
+        const response = await fetch('https://ai-assistant-caller.fly.dev/api/me', {
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
-
+    
         if (!response.ok) {
           throw new Error('Failed to fetch user email');
         }
-
+    
         const data = await response.json();
         setEmail(data.email);
       } catch (error) {
         console.error('Error fetching user email:', error);
       }
-    };
+    };   
 
     fetchUserEmail();
   }, []);

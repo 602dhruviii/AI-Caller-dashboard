@@ -11,7 +11,6 @@ interface Package {
   TWILIO_AUTH_TOKEN: string;
   FROM_NUMBER: string;
   APP_NUMBER: string;
-  YOUR_NUMBER: string;
   OPENAI_API_KEY: string;
   DEEPGRAM_API_KEY: string;
   GROQ_API_KEY: string;
@@ -32,7 +31,7 @@ const ModalTwo: React.FC<ModalTwoProps> = ({ searchId, onClose }) => {
           throw new Error("No token found.");
         }
 
-        const response = await fetch(`https://ai-call-assistant.fly.dev/api/env/${encodeURIComponent(searchId)}`, {
+        const response = await fetch(`https://ai-assistant-caller.fly.dev/api/env/${encodeURIComponent(searchId)}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -102,10 +101,6 @@ const ModalTwo: React.FC<ModalTwoProps> = ({ searchId, onClose }) => {
             <div className="flex justify-between border-b pb-2">
               <span className="font-medium">App Number</span>
               <span>{data.APP_NUMBER}</span>
-            </div>
-            <div className="flex justify-between border-b pb-2">
-              <span className="font-medium">Your Number</span>
-              <span>{data.YOUR_NUMBER}</span>
             </div>
             <div className="flex justify-between border-b pb-2">
               <span className="font-medium">Deepgram API Key</span>

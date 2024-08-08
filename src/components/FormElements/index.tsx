@@ -8,7 +8,6 @@ const FormElements = () => {
     TWILIO_AUTH_TOKEN: "",
     FROM_NUMBER: "",
     APP_NUMBER: "",
-    YOUR_NUMBER: "",
     DEEPGRAM_API_KEY: "",
     GROQ_API_KEY: "",
     VOICE_MODEL: "",
@@ -77,14 +76,15 @@ const FormElements = () => {
     }
 
     // Validation: Check if any field is empty
-    const hasEmptyFields = Object.values(formData).some(
-      (value) => value === "" || value === false,
-    );
+    const hasEmptyFields = Object.entries(formData)
+      .filter(([key]) => key !== "RECORDING_ENABLED") // Exclude RECORDING_ENABLED
+      .some(([_, value]) => value === "" || value === false); // Check for empty fields
 
     if (hasEmptyFields) {
       setAlert({
         type: "info",
-        message: "All fields must be filled before submission",
+        message:
+          "All fields except RECORDING_ENABLED must be filled before submission",
       });
       return;
     }
@@ -93,7 +93,7 @@ const FormElements = () => {
       let success = true;
 
       // First API call
-      const responseEnv = await fetch("https://ai-call-assistant.fly.dev/api/update-env", {
+      const responseEnv = await fetch("https://ai-assistant-caller.fly.dev/api/update-env", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +105,7 @@ const FormElements = () => {
       if (responseEnv.ok) {
         // Second API call
         const responseContent = await fetch(
-          "https://ai-call-assistant.fly.dev/setUserContent",
+          "https://ai-assistant-caller.fly.dev/setUserContent",
           {
             method: "POST",
             headers: {
@@ -248,19 +248,6 @@ const FormElements = () => {
                   placeholder="Enter number (+countrycodenumber eg: +918700659586)"
                   className="appNumber w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   value={formData.APP_NUMBER}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                  To Number
-                </label>
-                <input
-                  type="text"
-                  name="YOUR_NUMBER"
-                  placeholder="Enter number (+countrycodenumber eg: +918700659586)"
-                  className="toNumber w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  value={formData.YOUR_NUMBER}
                   onChange={handleChange}
                 />
               </div>

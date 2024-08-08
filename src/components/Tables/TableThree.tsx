@@ -2,21 +2,7 @@
 import { useEffect, useState } from "react";
 import Modal from "./Modal";
 import ModalTwo from "./ModalTwo";
-
-interface Package {
-  _id: string;
-  createdAt: string;
-  callCount: number;
-  Agent_Name: string;
-  TWILIO_ACCOUNT_SID: string;
-  TWILIO_AUTH_TOKEN: string;
-  DEEPGRAM_API_KEY: string;
-  GROQ_API_KEY: string;
-  FROM_NUMBER: number;
-  APP_NUMBER: number;
-  YOUR_NUMBER:number,
-  botStory: string;
-}
+import { Package } from "@/types/package";
 
 const TableThree = () => {
   const [data, setData] = useState<Package[]>([]);
@@ -24,31 +10,39 @@ const TableThree = () => {
   const [selectedItemtwo, setSelectedItemtwo] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalTwoOpen, setIsModalTwoOpen] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem('token');
-            if (!token) {
-                alert('You must be logged in to view agents');
-                return;
-            }
+      if (!token) {
+        alert('You must be logged in to view agents');
+        return;
+      }
+
       try {
-        const response = await fetch('https://ai-call-assistant.fly.dev/api/env/', {
+        const response = await fetch('https://ai-assistant-caller.fly.dev/api/env/', {
           method: 'GET',
           headers: {
-              'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`
           }
-      });
+        });
+
         if (!response.ok) {
           throw new Error("Network response was not ok.");
         }
+
         const result = await response.json();
         console.log(result);
-        setData(result);
+
+        if (Array.isArray(result) && result.length > 0) {
+          setData(result);
+        } else {
+          setData([]); // Ensure data is set to empty array if result is empty
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-
     };
 
     fetchData();
@@ -57,6 +51,7 @@ const TableThree = () => {
   const handleEdit = (item: Package) => {
     setSelectedItem(item);
     setIsModalOpen(true);
+    setSelectedPackage(item);
   };
   const handleView = (id: string) => {
     setSelectedItemtwo(id);
@@ -68,7 +63,7 @@ const TableThree = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`https://ai-call-assistant.fly.dev/api/env/${id}`, {
+      const response = await fetch(`https://ai-assistant-caller.fly.dev/api/env/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include the authorization token
@@ -92,6 +87,12 @@ const TableThree = () => {
   return (
     <div className="rounded-sm border border-stroke bg-white px-5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <div className="max-w-full overflow-x-auto">
+      {data.length === 0 ? (
+          <div className="text-center p-4 text-gray-600 dark:text-gray-400">
+            <p>No agents found. Please create an agent.</p>
+            {/* Optionally, you could add a button here to navigate to the agent creation page */}
+          </div>
+        ) : (
         <table className="w-full table-auto" style={{ height: "100%" }}>
           <thead>
             <tr className="bg-gray-2 text-left dark:bg-meta-4">
@@ -212,11 +213,12 @@ const TableThree = () => {
             ))}
           </tbody>
         </table>
+        )}
       </div>
       {isModalOpen && (
         <Modal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => setIsModalOpen(false)} data={selectedPackage || null}
         />
       )}
       {isModalTwoOpen && selectedItemtwo && (

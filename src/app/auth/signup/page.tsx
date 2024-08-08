@@ -1,51 +1,44 @@
 "use client";
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 const SignUp = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    
-    const payload = {
-      email,
-      password
-    };
-
+    const payload = { email, password };
     try {
-      const response = await fetch('https://ai-call-assistant.fly.dev/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+      const response = await fetch("https://ai-assistant-caller.fly.dev/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        alert('Sign up successful');
-        router.push('/auth/signin'); // Redirect to login page
+        alert("Sign up successful");
+        router.push("/auth/signin");
       } else {
         const result = await response.json();
-        alert('Error: ' + result.message);
+        alert("Error: " + result.message);
       }
     } catch (error) {
-      // Type guard to check if error is an instance of Error
       if (error instanceof Error) {
-        alert('Error signing up: ' + error.message);
+        alert("Error signing up: " + error.message);
       } else {
-        alert('Unknown error occurred');
+        alert("Unknown error occurred");
       }
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="bg-gray-100 dark:bg-gray-900 flex min-h-screen flex-col items-center justify-center">
       <div className="w-full max-w-md">
-        <div className="flex justify-center mb-6">
-          <span className="text-3xl font-bold text-gray-900 dark:text-white">
+        <div className="mb-6 flex justify-center">
+          <span className="text-gray-900 text-3xl font-bold dark:text-white">
             <svg
               width="24"
               height="24"
@@ -66,7 +59,10 @@ const SignUp = () => {
           </h1>
           <form id="signupForm" onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+              <label
+                htmlFor="email"
+                className="text-gray-700 dark:text-gray-200 block text-sm font-medium"
+              >
                 Email
               </label>
               <input
@@ -75,12 +71,15 @@ const SignUp = () => {
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="border-gray-300 mt-1 block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 required
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+              <label
+                htmlFor="password"
+                className="text-gray-700 dark:text-gray-200 block text-sm font-medium"
+              >
                 Password
               </label>
               <input
@@ -89,19 +88,33 @@ const SignUp = () => {
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="border-gray-300 mt-1 block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 required
               />
             </div>
             <button
               type="submit"
-              className="w-full rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               Sign Up
             </button>
-            <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-              Already have an account?{' '}
-              <a href="/auth/signin" className="font-medium text-indigo-600 hover:text-indigo-500">
+            <br/>
+            <br/>
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => signIn("google")}
+                className="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                Sign in with Google
+              </button>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 mt-2 text-center text-sm">
+              Already have an account?{" "}
+              <a
+                href="/auth/signin"
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
                 Log in
               </a>
             </p>

@@ -1,19 +1,20 @@
-import ECommerce from "@/components/Dashboard/E-commerce";
-import { Metadata } from "next";
+"use client";
 import SignUp from "./auth/signup/page";
-import SignIn from "./auth/signin/page";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-
-export const metadata: Metadata = {
-  title:
-    "AI-CALLER",
-  description: "AI-CALLER",
-};
+import { useSession } from 'next-auth/react';
+import { useEffect } from "react";
 
 export default function Home() {
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.user?.token) {
+      localStorage.setItem('token', session.user.token);
+    }
+  }, [session]);
+
   return (
     <>
-      <SignUp/>
+      <SignUp />
     </>
   );
 }

@@ -1,27 +1,13 @@
 import { useState, useEffect, useRef } from "react";
+import { Package } from "@/types/package";
 
-interface Package {
-  _id: string;
-  Agent_Name: string;
-  TWILIO_ACCOUNT_SID: string;
-  TWILIO_AUTH_TOKEN: string;
-  FROM_NUMBER: string;
-  APP_NUMBER: string;
-  YOUR_NUMBER: string;
-  DEEPGRAM_API_KEY: string;
-  GROQ_API_KEY: string;
-  VOICE_MODEL: string;
-  RECORDING_ENABLED: boolean;
-  content: string;
-  seccont: string;
-}
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  data?: Package;
+  data?: Package | null;
 }
 
-const Modal = ({ isOpen, onClose, data}: ModalProps) => {
+const Modal = ({ isOpen, onClose, data }: ModalProps) => {
   const [formData, setFormData] = useState<Package>({
     _id: "",
     Agent_Name: "",
@@ -29,15 +15,16 @@ const Modal = ({ isOpen, onClose, data}: ModalProps) => {
     TWILIO_AUTH_TOKEN: "",
     FROM_NUMBER: "",
     APP_NUMBER: "",
-    YOUR_NUMBER: "",
     DEEPGRAM_API_KEY: "",
     GROQ_API_KEY: "",
     VOICE_MODEL: "",
     RECORDING_ENABLED: false,
     content: "",
     seccont: "",
+    callCount: "",
+    createdAt: "",
   });
-  
+
   const [alert, setAlert] = useState<{
     type: "success" | "error";
     message: string;
@@ -45,7 +32,9 @@ const Modal = ({ isOpen, onClose, data}: ModalProps) => {
 
   const modalRef = useRef<HTMLDivElement>(null);
   const [scrollPercentage, setScrollPercentage] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<string>(formData.VOICE_MODEL);
+  const [selectedOption, setSelectedOption] = useState<string>(
+    formData.VOICE_MODEL,
+  );
   const optionsArray = [
     { value: "aura-asteria-en", label: "aura-asteria-en (Female)" },
     { value: "aura-luna-en", label: "aura-luna-en (Female)" },
@@ -63,7 +52,7 @@ const Modal = ({ isOpen, onClose, data}: ModalProps) => {
   useEffect(() => {
     if (data) {
       setFormData(data);
-      setSelectedOption(data.VOICE_MODEL); 
+      setSelectedOption(data.VOICE_MODEL);
     }
   }, [data]);
 
@@ -85,30 +74,39 @@ const Modal = ({ isOpen, onClose, data}: ModalProps) => {
   }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
-    const { name, type, value } = e.target;
-  
-    if (type === "checkbox" || type === "radio") {
+    const { name, type } = e.target;
+
+    if (type === "checkbox") {
       const target = e.target as HTMLInputElement;
       setFormData((prevData) => ({
         ...prevData,
         [name]: target.checked,
       }));
-    } else {
-      // For text areas and selects
+    } else if (type === "select-one") {
+      const target = e.target as HTMLSelectElement;
       setFormData((prevData) => ({
         ...prevData,
-        [name]: value,
+        [name]: target.value,
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
       }));
     }
+
+    if (name === "VOICE_MODEL") {
+      setSelectedOption((e.target as HTMLSelectElement).value);
+    }
   };
-  
-  
 
   const handleEdit = async (id: string, updatedData: Partial<Package>) => {
     try {
-      const response = await fetch(`https://ai-call-assistant.fly.dev/api/env/${id}`, {
+      const response = await fetch(`https://ai-assistant-caller.fly.dev/api/env/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the authorization token
@@ -122,6 +120,7 @@ const Modal = ({ isOpen, onClose, data}: ModalProps) => {
       if (response.ok) {
         setAlert({ type: "success", message: "Agent updated successfully" });
         onClose(); // Close the modal after successful update
+        window.location.reload();
         // Optionally reload data or trigger a parent update
         // window.location.reload(); // Reload the page to reflect changes
       } else {
@@ -233,19 +232,6 @@ const Modal = ({ isOpen, onClose, data}: ModalProps) => {
                   </div>
                   <div>
                     <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                      Your Number
-                    </label>
-                    <input
-                      type="text"
-                      name="YOUR_NUMBER"
-                      placeholder="Enter Your Number"
-                      className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      value={formData.YOUR_NUMBER}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                       Deepgram API Key
                     </label>
                     <input
@@ -270,8 +256,8 @@ const Modal = ({ isOpen, onClose, data}: ModalProps) => {
                       onChange={handleChange}
                     />
                   </div>
-                                  {/* VOICE_MODEL Dropdown */}
-                                  <div className="mb-4.5">
+
+                  <div className="mb-4.5">
                     <label className="mb-2.5 block text-black dark:text-white">
                       Choose Voice Assistant
                     </label>
@@ -359,7 +345,6 @@ const Modal = ({ isOpen, onClose, data}: ModalProps) => {
                   </div>
 
                   <div>
-                    
                     <button
                       type="submit"
                       className="w-full rounded bg-primary py-3 text-center text-base font-semibold text-white transition hover:bg-opacity-90"

@@ -5,30 +5,41 @@ interface CardDataStatsProps {
 }
 
 const CardDataStats: React.FC<CardDataStatsProps> = ({ title }) => {
-  const [total, setTotal] = useState<string>("Loading...");
+  const [total, setTotal] = useState<string>("0");
 
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token"); // Retrieve token from local storage
+
       if (!token) {
         console.error("No token found");
+        setTotal("No token"); // Optionally, set a message indicating no token
         return;
       }
 
       try {
-        const response = await fetch("https://ai-call-assistant.fly.dev/api/env", {
+        const response = await fetch("https://ai-assistant-caller.fly.dev/api/env", {
           headers: {
-            Authorization: `Bearer ${token}` // Include token in the headers
-          }
+            Authorization: `Bearer ${token}`, // Include token in the headers
+          },
         });
+
         if (!response.ok) {
-          throw new Error("Network response was not ok.");
+          if (response.status === 404) {
+            console.error("API endpoint not found.");
+            setTotal("0"); // Optionally, set a message for 404 errors
+          } else {
+            throw new Error("Network response was not ok.");
+          }
+          return;
         }
+
         const result = await response.json();
         const count = Array.isArray(result) ? result.length : 0;
         setTotal(count.toString());
       } catch (error) {
         console.error("Error fetching data:", error);
+        setTotal("Error fetching data"); // Optionally, set a message for fetch errors
       }
     };
 
@@ -36,14 +47,19 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({ title }) => {
   }, []);
 
   return (
-    <div className="rounded-sm border border-stroke bg-white px-7.5 py-6 shadow-default dark:border-strokedark dark:bg-boxdark" style={{ display: "flex", flexDirection: "column" }}>
+    <div
+      className="rounded-sm border border-stroke bg-white px-7.5 py-6 shadow-default dark:border-strokedark dark:bg-boxdark"
+      style={{ display: "flex", flexDirection: "column" }}
+    >
       <h1
         className="text-title-md font-bold text-black dark:text-white"
         style={{ textAlign: "center" }}
       >
         {total}
       </h1>
-      <span className="text-sm font-medium" style={{ textAlign: "center" }}>{title}</span>
+      <span className="text-sm font-medium" style={{ textAlign: "center" }}>
+        {title}
+      </span>
     </div>
   );
 };
