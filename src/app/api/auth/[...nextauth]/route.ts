@@ -4,7 +4,7 @@ import { JWT } from "next-auth/jwt";
 
 interface CustomUser extends NextAuthUser {
   googleId?: string;
-  id: string; // Ensure id is mandatory and always a string
+  id: string;
 }
 
 interface CustomJWT extends JWT {
@@ -22,12 +22,11 @@ export const authOptions: NextAuthOptions = {
     error: '/auth/error',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: CustomJWT, user?: CustomUser }) {
       if (user) {
         const customUser = user as CustomUser;
         token.sub = customUser.id;
 
-        // Make a request to your backend to save the user data
         try {
           const response = await fetch('https://ai-assistant-caller.fly.dev/auth/google/callback', {
             method: 'POST',
@@ -37,7 +36,7 @@ export const authOptions: NextAuthOptions = {
 
           const data = await response.json();
           if (response.ok) {
-            (token as CustomJWT).token = data.token; // Use type assertion
+            token.token = data.token;
           }
         } catch (error) {
           console.error('Error saving user to backend:', error);
@@ -45,19 +44,19 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: NextAuthSession, token: CustomJWT }) {
       if (session.user) {
         session.user.id = token.sub as string;
-        session.user.token = (token as CustomJWT).token as string; // Use type assertion
+        session.user.token = token.token as string;
       }
       return session;
     },
-    async redirect({ url, baseUrl }) {
+    async redirect({ url, baseUrl }: { url: string, baseUrl: string }) {
       return '/Callerboard';
     },
   },
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt' as 'jwt',
   },
 };
 
