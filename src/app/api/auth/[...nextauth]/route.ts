@@ -1,8 +1,9 @@
-import NextAuth, { NextAuthOptions, User as NextAuthUser, Session as NextAuthSession } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { JWT } from "next-auth/jwt";
+import { User as NextAuthUser, Session as NextAuthSession } from "next-auth"; // Import the missing types
 
-interface CustomUser extends NextAuthUser {
+interface CustomUser extends NextAuthUser {  // Extend the imported User type
   googleId?: string;
   id: string;
 }
@@ -31,7 +32,7 @@ export const authOptions: NextAuthOptions = {
           const response = await fetch('https://ai-assistant-caller.fly.dev/auth/google/callback', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ googleId: customUser.id, email: customUser.email }),
+            body: JSON.stringify({ googleId: customUser.id, email: customUser.email }), // email should exist on CustomUser
           });
 
           const data = await response.json();
@@ -51,15 +52,16 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async redirect({ url, baseUrl }: { url: string, baseUrl: string }) {
+    async redirect() {
       return '/Callerboard';
     },
   },
   session: {
-    strategy: 'jwt' as 'jwt',
+    strategy: 'jwt',
   },
 };
 
 const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST };
+export const GET = handler;
+export const POST = handler;
