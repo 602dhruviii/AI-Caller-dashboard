@@ -42,10 +42,15 @@ const DropdownUser = () => {
     fetchUserEmail();
   }, []);
   const handleLogout = async () => {
-    // Clear local storage
     localStorage.clear();
-    document.cookie = 'next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+  
+    // Sign out using NextAuth
     await signOut({ redirect: false });
+  
+    // Redirect to the sign-in page
     router.push('/auth/signin');
   };
   return (
