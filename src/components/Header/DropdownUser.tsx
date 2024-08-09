@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { signOut } from 'next-auth/react';
+import { signOut } from "next-auth/react";
 import Image from "next/image";
 import ClickOutside from "@/components/ClickOutside";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -12,37 +12,40 @@ const DropdownUser = () => {
   useEffect(() => {
     // Fetch the user's email from the API
     const fetchUserEmail = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        console.error('No token found');
+        console.error("No token found");
         return;
       }
-    
+
       try {
-        const response = await fetch('https://ai-assistant-caller.fly.dev/api/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await fetch(
+          "https://ai-assistant-caller.fly.dev/api/me",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
-    
+        );
+
         if (!response.ok) {
-          throw new Error('Failed to fetch user email');
+          throw new Error("Failed to fetch user email");
         }
-    
+
         const data = await response.json();
         setEmail(data.email);
       } catch (error) {
-        console.error('Error fetching user email:', error);
+        console.error("Error fetching user email:", error);
       }
-    };   
+    };
 
     fetchUserEmail();
   }, []);
   const handleLogout = () => {
     localStorage.clear(); // Clear all data from localStorage
-    signOut({ redirect: false }).then(() => {
-      router.push('/auth/signup'); // Redirect to the sign-in page after sign out
-    });
+    signOut({ redirect: false });
+    alert("logging out");
+    router.push('/auth/signup'); 
   };
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
@@ -53,7 +56,7 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-          {email || "Guest"}
+            {email || "Guest"}
           </span>
         </span>
 
@@ -106,7 +109,10 @@ const DropdownUser = () => {
               </Link>
             </li>
           </ul>
-          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base" onClick={handleLogout}>
+          <button
+            className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+            onClick={handleLogout}
+          >
             <svg
               className="fill-current"
               width="22"
