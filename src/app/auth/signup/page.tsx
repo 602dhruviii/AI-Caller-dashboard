@@ -12,11 +12,14 @@ const SignUp = () => {
     event.preventDefault();
     const payload = { email, password };
     try {
-      const response = await fetch("https://ai-assistant-caller.fly.dev/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        "https://ai-assistant-caller.fly.dev/auth/signup",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
 
       if (response.ok) {
         alert("Sign up successful");
@@ -98,17 +101,21 @@ const SignUp = () => {
             >
               Sign Up
             </button>
-            <br/>
-            <br/>
-            <div className="text-center">
+            <br />
+            <br />
+            <div className="my-4 text-center">
               <button
                 type="button"
-                onClick={() => signIn("google")}
-                className="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                onClick={() => signIn("google", { prompt: "login" })}
+                className="hover:bg-red-700 focus:ring-red-500 w-full rounded-md px-4 py-2 font-medium text-white focus:outline-none focus:ring-2"
+                style={{
+                  backgroundColor: "rgb(37 99 235 / var(--tw-bg-opacity))",
+                }}
               >
                 Sign in with Google
               </button>
             </div>
+
             <p className="text-gray-600 dark:text-gray-400 mt-2 text-center text-sm">
               Already have an account?{" "}
               <a
