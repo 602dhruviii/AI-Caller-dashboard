@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Modal from "./Modal";
 import ModalTwo from "./ModalTwo";
 import { Package } from "@/types/package";
+import { useRouter } from 'next/navigation';
 
 const TableThree = () => {
   const [data, setData] = useState<Package[]>([]);
@@ -11,13 +12,15 @@ const TableThree = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalTwoOpen, setIsModalTwoOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+  const router = useRouter();
+  
 
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
         alert('You must be logged in to view agents');
-        return;
+        router.push('/auth/signup'); 
       }
 
       try {

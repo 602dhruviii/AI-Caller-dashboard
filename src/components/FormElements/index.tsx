@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 const FormElements = () => {
   const [formData, setFormData] = useState({
     Agent_Name: "",
@@ -18,11 +18,20 @@ const FormElements = () => {
 
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
+  const router = useRouter();
   const [alert, setAlert] = useState<{
     type: "success" | "warning" | "info" | null;
     message: string;
   } | null>(null);
-
+  useEffect(() => {
+    const fetchStatus = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/auth/signup");
+      }
+    };
+    fetchStatus();
+  });
   const optionsArray = [
     { value: "aura-asteria-en", label: "aura-asteria-en (Female)" },
     { value: "aura-luna-en", label: "aura-luna-en (Female)" },
@@ -93,14 +102,17 @@ const FormElements = () => {
       let success = true;
 
       // First API call
-      const responseEnv = await fetch("https://ai-assistant-caller.fly.dev/api/update-env", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const responseEnv = await fetch(
+        "https://ai-assistant-caller.fly.dev/api/update-env",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData),
-      });
+      );
 
       if (responseEnv.ok) {
         // Second API call

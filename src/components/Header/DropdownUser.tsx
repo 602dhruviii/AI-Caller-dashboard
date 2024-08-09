@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { signOut } from 'next-auth/react';
 import Image from "next/image";
 import ClickOutside from "@/components/ClickOutside";
 import { useRouter } from 'next/navigation';
@@ -38,8 +39,10 @@ const DropdownUser = () => {
     fetchUserEmail();
   }, []);
   const handleLogout = () => {
-    localStorage.clear();
-    router.push('/auth/signin');
+    localStorage.clear(); // Clear all data from localStorage
+    signOut({ redirect: false }).then(() => {
+      router.push('/auth/signup'); // Redirect to the sign-in page after sign out
+    });
   };
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
