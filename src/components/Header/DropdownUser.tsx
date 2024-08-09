@@ -41,11 +41,12 @@ const DropdownUser = () => {
 
     fetchUserEmail();
   }, []);
-  const handleLogout = () => {
-    localStorage.clear(); // Clear all data from localStorage
-    signOut({ redirect: false });
-    alert("logging out");
-    router.push('/auth/signup'); 
+  const handleLogout = async () => {
+    // Clear local storage
+    localStorage.clear();
+    document.cookie = 'next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    await signOut({ redirect: false });
+    router.push('/auth/signin');
   };
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
